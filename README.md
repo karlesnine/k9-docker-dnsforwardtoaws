@@ -1,3 +1,5 @@
+![Dns forward to aws CI /CD](https://github.com/karlesnine/k9-docker-dnsforwardtoaws/workflows/Dns%20forward%20to%20aws%20CI%20/CD/badge.svg)
+
 # DNS forward to aws
 
 How to resolve Route 53 private hosted zones from an on-premises network via an Ubuntu instance?
