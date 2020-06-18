@@ -1,4 +1,4 @@
-name: karlesnine/k9-docker-dnsforwardtoaws:latest
+name: Dns forward to aws CI /CD
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  cd:
+  docker:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,6 +27,7 @@ jobs:
         run: | 
           echo "::set-env name=LAST_TAG::$(git describe --tags `git rev-list --tags --max-count=1`)"
           echo "::set-env name=IMAGE_NAME::$(basename $(pwd))"
+          echo "${{ env.LAST_TAG }}"
       - name: Docker login
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
       - name: Show
