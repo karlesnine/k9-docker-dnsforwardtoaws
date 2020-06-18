@@ -1,0 +1,45 @@
+name: karlesnine/k9-docker-dnsforwardtoaws:latest
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2 # https://github.com/actions/checkout
+        with:
+          repository: ${{ github.repository }}
+          ref: 'master'
+          token: ${{ github.token }}
+          clean: 'true'
+          fetch-depth: '1'
+      - name: Fetch_all_tag
+        run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - name: Last Tag
+        run: | 
+          echo "::set-env name=LAST_TAG::$(git describe --tags `git rev-list --tags --max-count=1`)"
+          echo "::set-env name=IMAGE_NAME::$(basename $(pwd))"
+      - name: Docker login
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Show
+        run: |
+          echo "LAST_TAG is ${{ env.LAST_TAG }}"
+          echo "IMAGE_NAME is ${{ env.IMAGE_NAME }}"
+      - name: Build
+        run: docker image build --force-rm --pull -t ${{ env.IMAGE_NAME }} . 
+      - name: Tags
+        run: |
+          docker tag ${{ env.IMAGE_NAME }} ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.LAST_TAG }}
+          docker tag ${{ env.IMAGE_NAME }} ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+      - name: Push
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.LAST_TAG }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
